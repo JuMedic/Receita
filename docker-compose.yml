@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  receira:
+    build: .
+    container_name: receira-viral-system
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+    ports:
+      - "${API_PORT:-8080}:8080"
+    networks:
+      - receira-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import sys; sys.exit(0)"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # Opcional: Redis para cache
+  redis:
+    image: redis:7-alpine
+    container_name: receira-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - receira-network
+    command: redis-server --appendonly yes
+
+  # Opcional: PostgreSQL para dados estruturados
+  postgres:
+    image: postgres:15-alpine
+    container_name: receira-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: receira
+      POSTGRES_USER: receira
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-changeme}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - receira-network
+
+networks:
+  receira-network:
+    driver: bridge
+
+volumes:
+  redis-data:
+  postgres-data:

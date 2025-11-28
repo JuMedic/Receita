@@ -1,0 +1,55 @@
+# Ambientes virtuais Python
+venv/
+env/
+ENV/
+.venv
+
+# Arquivos de configuração sensíveis
+.env
+*.local
+
+# Dados e cache
+data/
+logs/
+*.db
+*.sqlite
+*.sqlite3
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+
+# Media
+media/
+*.mp4
+*.jpg
+*.jpeg
+*.png
+*.gif
+
+# Backups
+*.bak
+backup/
