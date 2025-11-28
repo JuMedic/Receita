@@ -2,6 +2,7 @@
 Orquestrador principal - coordena todo o sistema 24/7.
 """
 import asyncio
+import os
 from datetime import datetime, timedelta
 from typing import List
 from loguru import logger
@@ -12,6 +13,11 @@ from src.utils.deduplication import DeduplicationService
 from src.publishers.publisher_service import PublisherService
 from src.models import Recipe
 from config.settings import config
+
+# Modo demo: carrega receitas de exemplo se habilitado
+DEMO_MODE = os.getenv("DEMO_MODE", "true").lower() == "true"
+if DEMO_MODE:
+    from src.demo_simple import generate_demo_recipes
 
 
 class SystemOrchestrator:
@@ -31,6 +37,12 @@ class SystemOrchestrator:
         self.cycle_count = 0
         self.start_time = None
         self.processed_recipes: List[Recipe] = []
+        
+        # Carregar receitas demo se habilitado
+        if DEMO_MODE:
+            self.logger.info("🎭 MODO DEMO ATIVADO - Carregando receitas de exemplo")
+            self.processed_recipes = generate_demo_recipes()
+            self.logger.info(f"✓ {len(self.processed_recipes)} receitas demo carregadas")
     
     async def start(self):
         """Inicia sistema 24/7"""

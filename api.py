@@ -152,7 +152,7 @@ async def stop_system():
 @app.get("/api/recipes", response_model=List[RecipeResponse])
 async def get_recipes(
     limit: int = Query(20, ge=1, le=100),
-    priority: Optional[str] = Query(None, regex="^(viral|highlight|normal)$")
+    priority: Optional[str] = Query(None, pattern="^(viral|highlight|normal)$")
 ):
     """Lista receitas processadas"""
     if not orchestrator:
@@ -168,6 +168,20 @@ async def get_recipes(
     recipes = recipes[-limit:]
     
     # Converter para response
+    return [
+        RecipeResponse(
+            title=r.title,
+            slug=r.slug,
+            summary=r.summary,
+            category=r.category.value,
+            views=r.trend_metrics.views,
+            likes=r.trend_metrics.likes,
+            shares=r.trend_metrics.shares,
+            priority=r.publish_recommendation.priority.value,
+            source_url=str(r.source.url)
+        )
+        for r in recipes
+    ]
     return [
         RecipeResponse(
             title=r.title,
